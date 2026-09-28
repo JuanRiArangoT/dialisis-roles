@@ -1,0 +1,14 @@
+services:
+  roles:
+    build: .
+    container_name: dialisis-roles
+    ports:
+      - "8002:8000"
+    env_file:
+      - .env
+    networks:
+      - dialisis-network
+
+networks:
+  dialisis-network:
+    external: true
