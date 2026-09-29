@@ -2,13 +2,31 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from roles.adapters.inbound.http.exceptions import (
+    permission_conflict_exception_handler,
+    permission_not_found_exception_handler,
     role_conflict_exception_handler,
     role_not_found_exception_handler,
+    role_permission_conflict_exception_handler,
+    role_permission_not_found_exception_handler,
+)
+from roles.adapters.inbound.http.routes.permissions import (
+    router as permissions_router,
+)
+from roles.adapters.inbound.http.routes.role_permissions import (
+    router as role_permissions_router,
 )
 from roles.adapters.inbound.http.routes.roles import router as roles_router
+from roles.application.exceptions.permission_exceptions import (
+    PermissionConflictError,
+    PermissionNotFoundApplicationError,
+)
 from roles.application.exceptions.role_exceptions import (
     RoleConflictError,
     RoleNotFoundApplicationError,
+)
+from roles.application.exceptions.role_permission_exceptions import (
+    RolePermissionConflictError,
+    RolePermissionNotFoundApplicationError,
 )
 
 app = FastAPI(
@@ -30,6 +48,8 @@ app.add_middleware(
 )
 
 app.include_router(roles_router)
+app.include_router(permissions_router)
+app.include_router(role_permissions_router)
 
 
 @app.get("/health")
@@ -45,4 +65,24 @@ app.add_exception_handler(
 app.add_exception_handler(
     RoleNotFoundApplicationError,
     role_not_found_exception_handler,
+)
+
+app.add_exception_handler(
+    PermissionConflictError,
+    permission_conflict_exception_handler,
+)
+
+app.add_exception_handler(
+    PermissionNotFoundApplicationError,
+    permission_not_found_exception_handler,
+)
+
+app.add_exception_handler(
+    RolePermissionConflictError,
+    role_permission_conflict_exception_handler,
+)
+
+app.add_exception_handler(
+    RolePermissionNotFoundApplicationError,
+    role_permission_not_found_exception_handler,
 )
